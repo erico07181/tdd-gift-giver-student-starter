@@ -1,23 +1,41 @@
+const { BadRequestError } = require("../utils/errors");
+
 class GiftExchange {
   static async pairs(names) {
-    var used = [];
-    var picks = [];
-    pickpool = names.slice(0);
-    if (names.length % 2 != 0) {
-      return "Names must be even";
-    } else {
-      for (var i = 0; i < names.length; i++) {
-        var random = Math.floor(Math.random() * pickpool.length);
-        if (names[random] == names[i]) {
-          picks.push(names[i] + picks[random++]);
-          pickpool.splice(random++, 1);
-        } else {
-          picks.push(names[i] + pickpool[random]);
-          pickpool.splice(random, 1);
-        }
-      }
-    }
-  }
+    console.log("here");
 
-  static async traditional(names) {}
+    if (names.length % 2 === 1) {
+      throw new BadRequestError("Names array must be even");
+    }
+    const namedPairs = [];
+    while (names.length) {
+      const currentPair = [];
+      while (currentPair.length < 2 && names.length > 0) {
+        const selectedNameIndex = Math.floor(Math.random() * names.length);
+        const selectedName = names[selectedNameIndex];
+        names.splice(selectedNameIndex, 1);
+        currentPair.push(selectedName);
+      }
+      namedPairs.push(currentPair);
+    }
+    return namedPairs;
+  }
+  static async traditional(names) {
+    let nameArr = names.names;
+    let newArray = [];
+    let firstIndex = Math.floor(Math.random() * nameArr.length);
+    let firstName = nameArr[firstIndex];
+    let lastChosen = firstName;
+    nameArr.splice(firstIndex, 1);
+    while (nameArr.length > 0) {
+      let newInd = Math.floor(Math.random() * nameArr.length);
+      let newChosen = nameArr[newInd];
+      newArray.push(`${lastChosen} is giving a gift to ${newChosen}`);
+      lastChosen = newChosen;
+      nameArr.splice(newInd, 1);
+    }
+    newArray.push(`${lastChosen} is giving a gift to ${firstName}`);
+    return newArray;
+  }
 }
+module.exports = GiftExchange;
